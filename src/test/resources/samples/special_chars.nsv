@@ -1,0 +1,13 @@
+v:1.0
+---
+field with spaces
+field,with,commas
+field	with	tabs
+
+field"with"quotes
+field'with'quotes
+field\\with\\backslashes
+
+field\nwith\nnewlines
+field, just field
+
