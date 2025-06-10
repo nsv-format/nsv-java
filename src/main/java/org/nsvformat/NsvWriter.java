@@ -10,7 +10,7 @@ public class NsvWriter implements AutoCloseable {
     private boolean headerWritten = false;
 
     public NsvWriter(OutputStream outputStream) {
-        this(new OutputStreamWriter(outputStream));
+        this(new OutputStreamWriter(outputStream, java.nio.charset.StandardCharsets.UTF_8));
     }
 
     public NsvWriter(Writer writer) {
@@ -24,7 +24,7 @@ public class NsvWriter implements AutoCloseable {
     }
 
     public static NsvWriter withMetadata(OutputStream outputStream, Collection<String> metadata) {
-        return withMetadata(new OutputStreamWriter(outputStream), metadata);
+        return withMetadata(new OutputStreamWriter(outputStream, java.nio.charset.StandardCharsets.UTF_8), metadata);
     }
 
     private void writeHeader(Collection<String> metadata) {

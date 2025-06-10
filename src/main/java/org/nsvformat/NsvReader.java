@@ -6,15 +6,16 @@ import java.util.stream.Stream;
 
 public class NsvReader implements AutoCloseable {
     private static final String META_SEPARATOR = "---";
-    private final BufferedReader reader;
+    private final Scanner scanner;
     private final List<String> metadata;
 
     public NsvReader(InputStream inputStream) {
-        this(new InputStreamReader(inputStream));
+        this(new InputStreamReader(inputStream, java.nio.charset.StandardCharsets.UTF_8));
     }
 
     public NsvReader(Reader reader) {
-        this.reader = new BufferedReader(reader);
+        this.scanner = new Scanner(reader);
+        this.scanner.useDelimiter("\n");
         this.metadata = new ArrayList<>();
         parseHeader();
     }
@@ -24,36 +25,30 @@ public class NsvReader implements AutoCloseable {
     }
 
     private void parseHeader() {
-        try {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                if (META_SEPARATOR.equals(line)) {
-                    return;
-                }
-                metadata.add(line);
+        String line;
+        while (scanner.hasNext()) {
+            line = scanner.next();
+            if (META_SEPARATOR.equals(line)) {
+                return;
             }
-            throw new IllegalArgumentException("Invalid NSV: missing header separator");
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
+            metadata.add(line);
         }
+        throw new IllegalArgumentException("Invalid NSV: missing header separator");
     }
 
     public Optional<List<String>> readRow() {
-        try {
-            var row = new ArrayList<String>();
-            String line;
-            
-            while ((line = reader.readLine()) != null) {
-                if (line.isEmpty()) {
-                    return Optional.of(List.copyOf(row));
-                }
-                row.add(unescape(line));
+        var row = new ArrayList<String>();
+        String line;
+        
+        while (scanner.hasNext()) {
+            line = scanner.next();
+            if (line.isEmpty()) {
+                return Optional.of(List.copyOf(row));
             }
-            
-            return row.isEmpty() ? Optional.empty() : Optional.of(List.copyOf(row));
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
+            row.add(unescape(line));
         }
+        
+        return row.isEmpty() ? Optional.empty() : Optional.of(List.copyOf(row));
     }
 
     public Stream<List<String>> rows() {
@@ -68,6 +63,6 @@ public class NsvReader implements AutoCloseable {
 
     @Override
     public void close() throws IOException {
-        reader.close();
+        scanner.close();
     }
 }
