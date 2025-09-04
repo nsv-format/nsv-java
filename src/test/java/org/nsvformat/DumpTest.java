@@ -2,6 +2,7 @@ package org.nsvformat;
 
 import org.junit.jupiter.api.Test;
 import java.io.StringWriter;
+import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class DumpTest {
@@ -28,12 +29,16 @@ public class DumpTest {
     public void testParity() {
         for (var entry : TestUtils.SAMPLES_DATA.entrySet()) {
             String name = entry.getKey();
-            NsvData data = entry.getValue();
+            List<List<String>> data = entry.getValue();
             
-            String dumpsResult = Nsv.write(data.rows(), data.metadata());
+            String dumpsResult = Nsv.dumps(data);
             
             StringWriter stringWriter = new StringWriter();
-            Nsv.write(data.rows(), stringWriter, data.metadata());
+            try {
+                Nsv.dump(data, stringWriter);
+            } catch (Exception e) {
+                fail("Failed to dump data for sample: " + name, e);
+            }
             String dumpResult = stringWriter.toString();
             
             assertEquals(dumpsResult, dumpResult, "Parity check failed for sample: " + name);

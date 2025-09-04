@@ -19,14 +19,14 @@ public class EdgeCasesTest {
             List.of(longString, "normal")
         );
         
-        NsvData result = TestUtils.dumpThenLoad(data);
-        assertEquals(data, result.rows());
+        List<List<String>> result = TestUtils.dumpThenLoad(data);
+        assertEquals(data, result);
     }
 
     @Test
     public void testSpecialCharacters() {
-        NsvData expected = TestUtils.SAMPLES_DATA.get("special_chars");
-        NsvData actual = TestUtils.loadSample("special_chars");
+        List<List<String>> expected = TestUtils.SAMPLES_DATA.get("special_chars");
+        List<List<String>> actual = TestUtils.loadSample("special_chars");
         assertEquals(expected, actual);
     }
 }

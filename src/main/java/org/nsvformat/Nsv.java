@@ -1,63 +1,138 @@
 package org.nsvformat;
 
 import java.io.*;
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.List;
 
 public final class Nsv {
     private Nsv() {}
 
-    public static NsvData read(InputStream inputStream) {
-        try (var reader = new NsvReader(inputStream)) {
-            var metadata = reader.metadata();
-            var rows = reader.rows().toList();
-            return new NsvData(metadata, rows);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
+    public static List<List<String>> loads(String s) {
+        return parse(s);
+    }
+    
+    public static List<List<String>> parse(String s) {
+        List<List<String>> data = new ArrayList<>();
+        List<String> row = new ArrayList<>();
+        int start = 0;
+        
+        for (int pos = 0; pos < s.length(); pos++) {
+            char c = s.charAt(pos);
+            if (c == '\n') {
+                if (pos - start >= 1) {
+                    row.add(unescape(s.substring(start, pos)));
+                } else {
+                    data.add(row);
+                    row = new ArrayList<>();
+                }
+                start = pos + 1;
+            }
+        }
+        
+        return data;
+    }
+    
+    public static String dumps(List<List<String>> data) {
+        return format(data);
+    }
+    
+    public static String format(List<List<String>> data) {
+        List<String> lines = new ArrayList<>();
+        for (List<String> row : data) {
+            for (String cell : row) {
+                lines.add(escape(cell));
+            }
+            lines.add("");
+        }
+        
+        StringBuilder result = new StringBuilder();
+        for (String line : lines) {
+            result.append(line).append("\n");
+        }
+        return result.toString();
+    }
+    
+    public static String escape(String s) {
+        if (s.isEmpty()) {
+            return "\\";
+        }
+        if (s.contains("\n") || s.contains("\\")) {
+            return s.replace("\\", "\\\\").replace("\n", "\\n");
+        }
+        return s;
+    }
+    
+    public static String unescape(String s) {
+        if (s.equals("\\")) {
+            return "";
+        }
+        if (!s.contains("\\")) {
+            return s;
+        }
+        
+        StringBuilder out = new StringBuilder();
+        boolean escaped = false;
+        for (char c : s.toCharArray()) {
+            if (escaped) {
+                if (c == 'n') {
+                    out.append('\n');
+                } else if (c == '\\') {
+                    out.append('\\');
+                } else {
+                    out.append('\\');
+                    out.append(c);
+                }
+                escaped = false;
+            } else {
+                if (c == '\\') {
+                    escaped = true;
+                } else {
+                    out.append(c);
+                }
+            }
+        }
+        return out.toString();
+    }
+    
+    public static List<List<String>> load(Reader reader) throws IOException {
+        return read(reader);
+    }
+    
+    public static List<List<String>> read(Reader reader) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        char[] buffer = new char[8192];
+        int read;
+        while ((read = reader.read(buffer)) != -1) {
+            sb.append(buffer, 0, read);
+        }
+        return parse(sb.toString());
+    }
+    
+    public static List<List<String>> load(InputStream inputStream) throws IOException {
+        return read(inputStream);
+    }
+    
+    public static List<List<String>> read(InputStream inputStream) throws IOException {
+        try (Reader reader = new InputStreamReader(inputStream, "UTF-8")) {
+            return read(reader);
         }
     }
-
-    public static NsvData read(Reader reader) {
-        try (var nsvReader = new NsvReader(reader)) {
-            var metadata = nsvReader.metadata();
-            var rows = nsvReader.rows().toList();
-            return new NsvData(metadata, rows);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
+    
+    public static void dump(List<List<String>> data, Writer writer) throws IOException {
+        write(data, writer);
+    }
+    
+    public static void write(List<List<String>> data, Writer writer) throws IOException {
+        writer.write(format(data));
+    }
+    
+    public static void dump(List<List<String>> data, OutputStream outputStream) throws IOException {
+        write(data, outputStream);
+    }
+    
+    public static void write(List<List<String>> data, OutputStream outputStream) throws IOException {
+        try (Writer writer = new OutputStreamWriter(outputStream, "UTF-8")) {
+            write(data, writer);
         }
-    }
-
-    public static NsvData read(String content) {
-        return read(new StringReader(content));
-    }
-
-    public static void write(Collection<? extends Collection<String>> rows, OutputStream outputStream) {
-        write(rows, outputStream, List.of());
-    }
-
-    public static void write(Collection<? extends Collection<String>> rows, OutputStream outputStream, Collection<String> metadata) {
-        try (var writer = NsvWriter.withMetadata(outputStream, metadata)) {
-            writer.writeRows(rows);
-        }
-    }
-
-    public static void write(Collection<? extends Collection<String>> rows, Writer writer) {
-        write(rows, writer, List.of());
-    }
-
-    public static void write(Collection<? extends Collection<String>> rows, Writer writer, Collection<String> metadata) {
-        try (var nsvWriter = NsvWriter.withMetadata(writer, metadata)) {
-            nsvWriter.writeRows(rows);
-        }
-    }
-
-    public static String write(Collection<? extends Collection<String>> rows) {
-        return write(rows, List.of());
-    }
-
-    public static String write(Collection<? extends Collection<String>> rows, Collection<String> metadata) {
-        var stringWriter = new StringWriter();
-        write(rows, stringWriter, metadata);
-        return stringWriter.toString();
     }
 }
