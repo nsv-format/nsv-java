@@ -26,17 +26,16 @@ implementation 'org.nsv-format:nsv-java:0.1.0'
 
 ```java
 import org.nsvformat.Nsv;
+import java.util.List;
 
-// From string
-var data = Nsv.read("v1\n---\nfirst\nrow\n\nsecond\nrow\n\n");
-var metadata = data.metadata();
-var rows = data.rows();
+// Parse from string
+List<List<String>> data = Nsv.parse("first\nrow\n\nsecond\nrow\n\n");
 
-// From InputStream
-var data = Nsv.read(inputStream);
+// Read from InputStream
+List<List<String>> data = Nsv.read(inputStream);
 
-// From Reader
-var data = Nsv.read(new FileReader("data.nsv"));
+// Read from Reader
+List<List<String>> data = Nsv.read(new FileReader("data.nsv"));
 ```
 
 ### Writing NSV
@@ -50,42 +49,45 @@ var rows = List.of(
     List.of("second", "row")
 );
 
-// To string
-var nsv = Nsv.write(rows);
+// Format to string
+String nsv = Nsv.format(rows);
 
-// With metadata
-var metadata = List.of("v1", "table");
-var nsv = Nsv.write(rows, metadata);
-
-// To OutputStream
+// Write to OutputStream
 Nsv.write(rows, outputStream);
 
-// To Writer
+// Write to Writer
 Nsv.write(rows, new FileWriter("output.nsv"));
 ```
 
-### Streaming
+### Escape Sequences
 
-For large files, use `NsvReader` directly:
+NSV handles special characters using backslash escaping:
+- `\\` represents a literal backslash
+- `\n` represents a newline character
+- `\` (alone) represents an empty string
 
 ```java
-import org.nsvformat.NsvReader;
-
-try (var reader = new NsvReader(inputStream)) {
-    var metadata = reader.metadata();
-    
-    // Process rows one by one
-    reader.rows().forEach(row -> {
-        // Process each row
-    });
-}
+// Example with special characters
+var data = List.of(
+    List.of("field with\nnewline", "field with\\backslash"),
+    List.of("", "empty field")
+);
+String nsv = Nsv.format(data);
+// Output: "field with\\nnewline\nfield with\\\\backslash\n\n\\\nempty field\n\n"
 ```
+
+## API Reference
+
+### Static Methods
+
+- `parse(String s)` - Parse NSV string into rows
+- `format(List<List<String>> data)` - Format rows as NSV string
+- `read(InputStream in)` - Read NSV from input stream
+- `read(Reader reader)` - Read NSV from reader
+- `write(List<List<String>> data, OutputStream out)` - Write NSV to output stream
+- `write(List<List<String>> data, Writer writer)` - Write NSV to writer
 
 ## Requirements
 
 - Java 17 or higher
 
-## Features
-
-- [x] Core parsing
-- [ ] `table`

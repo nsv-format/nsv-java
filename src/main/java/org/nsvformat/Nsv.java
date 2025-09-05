@@ -7,10 +7,6 @@ import java.util.List;
 public final class Nsv {
     private Nsv() {}
 
-    public static List<List<String>> loads(String s) {
-        return parse(s);
-    }
-    
     public static List<List<String>> parse(String s) {
         List<List<String>> data = new ArrayList<>();
         List<String> row = new ArrayList<>();
@@ -30,10 +26,6 @@ public final class Nsv {
         }
         
         return data;
-    }
-    
-    public static String dumps(List<List<String>> data) {
-        return format(data);
     }
     
     public static String format(List<List<String>> data) {
@@ -94,10 +86,6 @@ public final class Nsv {
         return out.toString();
     }
     
-    public static List<List<String>> load(Reader reader) throws IOException {
-        return read(reader);
-    }
-    
     public static List<List<String>> read(Reader reader) throws IOException {
         StringBuilder sb = new StringBuilder();
         char[] buffer = new char[8192];
@@ -108,26 +96,14 @@ public final class Nsv {
         return parse(sb.toString());
     }
     
-    public static List<List<String>> load(InputStream inputStream) throws IOException {
-        return read(inputStream);
-    }
-    
     public static List<List<String>> read(InputStream inputStream) throws IOException {
         try (Reader reader = new InputStreamReader(inputStream, "UTF-8")) {
             return read(reader);
         }
     }
     
-    public static void dump(List<List<String>> data, Writer writer) throws IOException {
-        write(data, writer);
-    }
-    
     public static void write(List<List<String>> data, Writer writer) throws IOException {
         writer.write(format(data));
-    }
-    
-    public static void dump(List<List<String>> data, OutputStream outputStream) throws IOException {
-        write(data, outputStream);
     }
     
     public static void write(List<List<String>> data, OutputStream outputStream) throws IOException {

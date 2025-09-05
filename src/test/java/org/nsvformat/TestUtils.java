@@ -69,7 +69,7 @@ public class TestUtils {
             if (inputStream == null) {
                 throw new RuntimeException("Sample file not found: " + name + ".nsv");
             }
-            return Nsv.load(inputStream);
+            return Nsv.read(inputStream);
         } catch (IOException e) {
             throw new RuntimeException("Failed to load sample: " + name, e);
         }
@@ -81,7 +81,7 @@ public class TestUtils {
                 throw new RuntimeException("Sample file not found: " + name + ".nsv");
             }
             String content = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
-            return Nsv.loads(content);
+            return Nsv.parse(content);
         } catch (IOException e) {
             throw new RuntimeException("Failed to load sample: " + name, e);
         }
@@ -92,7 +92,7 @@ public class TestUtils {
         if (sampleData == null) {
             throw new RuntimeException("Sample data not found: " + name);
         }
-        return Nsv.dumps(sampleData);
+        return Nsv.format(sampleData);
     }
     
     public static String dumpsSample(String name) {
@@ -100,12 +100,12 @@ public class TestUtils {
     }
     
     public static List<List<String>> dumpThenLoad(List<List<String>> data) {
-        String dumped = Nsv.dumps(data);
-        return Nsv.loads(dumped);
+        String dumped = Nsv.format(data);
+        return Nsv.parse(dumped);
     }
     
     public static String loadThenDump(String content) {
-        List<List<String>> loaded = Nsv.loads(content);
-        return Nsv.dumps(loaded);
+        List<List<String>> loaded = Nsv.parse(content);
+        return Nsv.format(loaded);
     }
 }
