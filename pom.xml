@@ -46,4 +46,11 @@
             </plugin>
         </plugins>
     </build>
+
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <url>https://maven.pkg.github.com/nsv-format/nsv-java</url>
+        </repository>
+    </distributionManagement>
 </project>
