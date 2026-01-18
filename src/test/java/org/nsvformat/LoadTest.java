@@ -34,8 +34,13 @@ public class LoadTest {
                 assertNotNull(inputStream, "Sample file not found: " + name + ".nsv");
                 String content = new String(inputStream.readAllBytes());
                 
-                List<List<String>> fromString = Nsv.parse(content);
-                List<List<String>> fromReader = Nsv.read(new StringReader(content));
+                List<List<String>> fromString = Nsv.decode(content);
+
+                var reader = new Reader(new StringReader(content));
+                List<List<String>> fromReader = new java.util.ArrayList<>();
+                while (reader.hasNext()) {
+                    fromReader.add(reader.next());
+                }
                 
                 assertEquals(fromString, fromReader, "Parity check failed for sample: " + name);
             } catch (Exception e) {

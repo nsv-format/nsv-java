@@ -31,17 +31,18 @@ public class DumpTest {
             String name = entry.getKey();
             List<List<String>> data = entry.getValue();
             
-            String formatResult = Nsv.format(data);
-            
+            String encodeResult = Nsv.encode(data);
+
             StringWriter stringWriter = new StringWriter();
             try {
-                Nsv.write(data, stringWriter);
+                var writer = new Writer(stringWriter);
+                writer.writeRows(data);
             } catch (Exception e) {
-                fail("Failed to dump data for sample: " + name, e);
+                fail("Failed to write data for sample: " + name, e);
             }
-            String writeResult = stringWriter.toString();
+            String writerResult = stringWriter.toString();
             
-            assertEquals(formatResult, writeResult, "Parity check failed for sample: " + name);
+            assertEquals(encodeResult, writerResult, "Parity check failed for sample: " + name);
         }
     }
 

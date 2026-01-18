@@ -1,17 +1,16 @@
 package org.nsvformat;
 
-import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public final class Nsv {
     private Nsv() {}
 
-    public static List<List<String>> parse(String s) {
+    public static List<List<String>> decode(String s) {
         List<List<String>> data = new ArrayList<>();
         List<String> row = new ArrayList<>();
         int start = 0;
-        
+
         for (int pos = 0; pos < s.length(); pos++) {
             char c = s.charAt(pos);
             if (c == '\n') {
@@ -24,11 +23,11 @@ public final class Nsv {
                 start = pos + 1;
             }
         }
-        
+
         return data;
     }
-    
-    public static String format(List<List<String>> data) {
+
+    public static String encode(List<List<String>> data) {
         List<String> lines = new ArrayList<>();
         for (List<String> row : data) {
             for (String cell : row) {
@@ -36,7 +35,7 @@ public final class Nsv {
             }
             lines.add("");
         }
-        
+
         StringBuilder result = new StringBuilder();
         for (String line : lines) {
             result.append(line).append("\n");
@@ -61,7 +60,7 @@ public final class Nsv {
         if (!s.contains("\\")) {
             return s;
         }
-        
+
         StringBuilder out = new StringBuilder();
         boolean escaped = false;
         for (char c : s.toCharArray()) {
@@ -84,31 +83,5 @@ public final class Nsv {
             }
         }
         return out.toString();
-    }
-    
-    public static List<List<String>> read(Reader reader) throws IOException {
-        StringBuilder sb = new StringBuilder();
-        char[] buffer = new char[8192];
-        int read;
-        while ((read = reader.read(buffer)) != -1) {
-            sb.append(buffer, 0, read);
-        }
-        return parse(sb.toString());
-    }
-    
-    public static List<List<String>> read(InputStream inputStream) throws IOException {
-        try (Reader reader = new InputStreamReader(inputStream, "UTF-8")) {
-            return read(reader);
-        }
-    }
-    
-    public static void write(List<List<String>> data, Writer writer) throws IOException {
-        writer.write(format(data));
-    }
-    
-    public static void write(List<List<String>> data, OutputStream outputStream) throws IOException {
-        try (Writer writer = new OutputStreamWriter(outputStream, "UTF-8")) {
-            write(data, writer);
-        }
     }
 }

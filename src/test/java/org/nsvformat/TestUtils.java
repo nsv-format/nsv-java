@@ -2,7 +2,9 @@ package org.nsvformat;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -69,7 +71,12 @@ public class TestUtils {
             if (inputStream == null) {
                 throw new RuntimeException("Sample file not found: " + name + ".nsv");
             }
-            return Nsv.read(inputStream);
+            Reader reader = new Reader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
+            List<List<String>> data = new ArrayList<>();
+            while (reader.hasNext()) {
+                data.add(reader.next());
+            }
+            return data;
         } catch (IOException e) {
             throw new RuntimeException("Failed to load sample: " + name, e);
         }
@@ -81,7 +88,7 @@ public class TestUtils {
                 throw new RuntimeException("Sample file not found: " + name + ".nsv");
             }
             String content = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
-            return Nsv.parse(content);
+            return Nsv.decode(content);
         } catch (IOException e) {
             throw new RuntimeException("Failed to load sample: " + name, e);
         }
@@ -92,7 +99,7 @@ public class TestUtils {
         if (sampleData == null) {
             throw new RuntimeException("Sample data not found: " + name);
         }
-        return Nsv.format(sampleData);
+        return Nsv.encode(sampleData);
     }
     
     public static String dumpsSample(String name) {
@@ -100,12 +107,12 @@ public class TestUtils {
     }
     
     public static List<List<String>> dumpThenLoad(List<List<String>> data) {
-        String dumped = Nsv.format(data);
-        return Nsv.parse(dumped);
+        String dumped = Nsv.encode(data);
+        return Nsv.decode(dumped);
     }
-    
+
     public static String loadThenDump(String content) {
-        List<List<String>> loaded = Nsv.parse(content);
-        return Nsv.format(loaded);
+        List<List<String>> loaded = Nsv.decode(content);
+        return Nsv.encode(loaded);
     }
 }
