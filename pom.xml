@@ -27,6 +27,7 @@
         <url>https://github.com/nsv-format/nsv-java</url>
     </scm>
 
+    <!-- TODO: update developers with real maintainer info before publishing to Central -->
     <developers>
         <developer>
             <name>nsv-format</name>
