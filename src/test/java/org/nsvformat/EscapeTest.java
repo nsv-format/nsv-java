@@ -2,6 +2,7 @@ package org.nsvformat;
 
 import org.junit.jupiter.api.Test;
 import java.util.List;
+import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class EscapeTest {
@@ -82,13 +83,13 @@ public class EscapeTest {
         );
 
         List<List<String>> result = seqseq.stream()
-            .map(row -> row.stream().map(Nsv::escape).toList())
-            .toList();
+            .map(row -> row.stream().map(Nsv::escape).collect(Collectors.toList()))
+            .collect(Collectors.toList());
         assertEquals(expected, result);
 
         List<List<String>> recovered = result.stream()
-            .map(row -> row.stream().map(Nsv::unescape).toList())
-            .toList();
+            .map(row -> row.stream().map(Nsv::unescape).collect(Collectors.toList()))
+            .collect(Collectors.toList());
         assertEquals(seqseq, recovered);
     }
 }
