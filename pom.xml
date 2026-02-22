@@ -11,6 +11,30 @@
 
     <name>nsv-java</name>
     <description>Java implementation of NSV (Newline-Separated Values) format</description>
+    <url>https://github.com/nsv-format/nsv-java</url>
+
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>https://opensource.org/licenses/MIT</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <scm>
+        <connection>scm:git:git://github.com/nsv-format/nsv-java.git</connection>
+        <developerConnection>scm:git:ssh://github.com:nsv-format/nsv-java.git</developerConnection>
+        <url>https://github.com/nsv-format/nsv-java</url>
+    </scm>
+
+    <!-- TODO: update developers with real maintainer info before publishing to Central -->
+    <developers>
+        <developer>
+            <name>nsv-format</name>
+            <organization>nsv-format</organization>
+            <organizationUrl>https://github.com/nsv-format</organizationUrl>
+        </developer>
+    </developers>
 
     <properties>
         <maven.compiler.source>11</maven.compiler.source>

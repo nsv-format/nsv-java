@@ -4,7 +4,20 @@ Java implementation of the [NSV (Newline-Separated Values)](https://nsv-format.o
 
 ## Installation
 
+Maven Central publishing is planned. For now, the package is available via [GitHub Packages](https://github.com/nsv-format/nsv-java/packages), which requires a GitHub account and a personal access token with `read:packages` scope.
+
 ### Maven
+
+Add the repository to your `pom.xml` or `~/.m2/settings.xml`:
+
+```xml
+<repository>
+    <id>github</id>
+    <url>https://maven.pkg.github.com/nsv-format/nsv-java</url>
+</repository>
+```
+
+Then add the dependency:
 
 ```xml
 <dependency>
@@ -17,7 +30,19 @@ Java implementation of the [NSV (Newline-Separated Values)](https://nsv-format.o
 ### Gradle
 
 ```groovy
-implementation 'org.nsv-format:nsv-java:0.2.0'
+repositories {
+    maven {
+        url = uri("https://maven.pkg.github.com/nsv-format/nsv-java")
+        credentials {
+            username = System.getenv("GITHUB_ACTOR")
+            password = System.getenv("GITHUB_TOKEN")
+        }
+    }
+}
+
+dependencies {
+    implementation 'org.nsv-format:nsv-java:0.2.0'
+}
 ```
 
 ## Usage
