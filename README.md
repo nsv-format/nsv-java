@@ -4,7 +4,7 @@ Java implementation of the [NSV (Newline-Separated Values)](https://nsv-format.o
 
 ## Installation
 
-Published to [GitHub Packages](https://github.com/nsv-format/nsv-java/packages). Requires [authenticating to GitHub Packages](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-apache-maven-registry).
+Maven Central publishing is planned. For now, the package is available via [GitHub Packages](https://github.com/nsv-format/nsv-java/packages), which requires a GitHub account and a personal access token with `read:packages` scope.
 
 ### Maven
 
