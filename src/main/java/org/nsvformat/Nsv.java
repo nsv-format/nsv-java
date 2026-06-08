@@ -24,6 +24,13 @@ public final class Nsv {
             }
         }
 
+        if (start < s.length()) {
+            row.add(unescape(s.substring(start)));
+        }
+        if (!row.isEmpty()) {
+            data.add(row);
+        }
+
         return data;
     }
 
