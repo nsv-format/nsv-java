@@ -114,4 +114,15 @@ public class DecodeTest {
         List<List<String>> expected = List.of(List.of(""));
         assertEquals(expected, Nsv.decode(input));
     }
+
+    @Test
+    public void testDecodeNoTrailingNewline() {
+        // Abrupt EOF: non-resumable decode emits the incomplete trailing cell/row
+        String input = "a\nb\nc\n\nd\ne\nf";
+        List<List<String>> expected = List.of(
+            List.of("a", "b", "c"),
+            List.of("d", "e", "f")
+        );
+        assertEquals(expected, Nsv.decode(input));
+    }
 }
