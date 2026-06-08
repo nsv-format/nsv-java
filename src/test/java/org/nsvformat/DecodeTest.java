@@ -117,7 +117,6 @@ public class DecodeTest {
 
     @Test
     public void testDecodeNoTrailingNewline() {
-        // Abrupt EOF: non-resumable decode emits the incomplete trailing cell/row
         String input = "a\nb\nc\n\nd\ne\nf";
         List<List<String>> expected = List.of(
             List.of("a", "b", "c"),
