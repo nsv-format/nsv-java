@@ -25,6 +25,7 @@ public class Reader implements Iterator<List<String>> {
         while (true) {
             for (int i = bufPos; i < bufLen; i++) {
                 if (buf[i] == '\n') {
+                    // Line complete, return
                     lineBuffer.append(buf, bufPos, i - bufPos);
                     bufPos = i + 1;
                     String line = lineBuffer.toString();
@@ -32,10 +33,12 @@ public class Reader implements Iterator<List<String>> {
                     return line;
                 }
             }
+            // Keep reading
             lineBuffer.append(buf, bufPos, bufLen - bufPos);
             bufLen = reader.read(buf, 0, buf.length);
             bufPos = 0;
             if (bufLen == -1) {
+                // Incomplete line at EOF, preserve lineBuffer for next call
                 bufLen = 0;
                 return null;
             }
