@@ -11,17 +11,15 @@ public final class Nsv {
         List<String> row = new ArrayList<>();
         int start = 0;
 
-        for (int pos = 0; pos < s.length(); pos++) {
-            char c = s.charAt(pos);
-            if (c == '\n') {
-                if (pos - start >= 1) {
-                    row.add(unescape(s.substring(start, pos)));
-                } else {
-                    data.add(row);
-                    row = new ArrayList<>();
-                }
-                start = pos + 1;
+        int pos;
+        while ((pos = s.indexOf('\n', start)) >= 0) {
+            if (pos > start) {
+                row.add(unescape(s.substring(start, pos)));
+            } else {
+                data.add(row);
+                row = new ArrayList<>();
             }
+            start = pos + 1;
         }
 
         if (start < s.length()) {
