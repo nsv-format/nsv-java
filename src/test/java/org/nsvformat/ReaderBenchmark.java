@@ -97,6 +97,37 @@ public class ReaderBenchmark {
         return System.nanoTime() - t0;
     }
 
+    static List<List<String>> oldDecode(String s) {
+        List<List<String>> data = new ArrayList<>();
+        List<String> row = new ArrayList<>();
+        int start = 0;
+        for (int pos = 0; pos < s.length(); pos++) {
+            char c = s.charAt(pos);
+            if (c == '\n') {
+                if (pos - start >= 1) {
+                    row.add(Nsv.unescape(s.substring(start, pos)));
+                } else {
+                    data.add(row);
+                    row = new ArrayList<>();
+                }
+                start = pos + 1;
+            }
+        }
+        if (start < s.length()) row.add(Nsv.unescape(s.substring(start)));
+        if (!row.isEmpty()) data.add(row);
+        return data;
+    }
+
+    static long benchOldDecode(String data, int iters) {
+        for (int i = 0; i < iters / 2; i++)
+            oldDecode(data);
+
+        long t0 = System.nanoTime();
+        for (int i = 0; i < iters; i++)
+            oldDecode(data);
+        return System.nanoTime() - t0;
+    }
+
     static long benchDecode(String data, int iters) {
         for (int i = 0; i < iters / 2; i++)
             Nsv.decode(data);
@@ -126,9 +157,10 @@ public class ReaderBenchmark {
             {10000, 5,   20,   100},
         };
 
-        System.out.printf("%-35s %12s %12s %12s %12s %8s%n",
-            "scenario", "old(raw)", "old(buf)", "new", "decode", "speedup");
-        System.out.println("-".repeat(95));
+        System.out.println("=== Reader: old per-char vs new bulk-scan ===");
+        System.out.printf("%-35s %12s %12s %12s %8s%n",
+            "scenario", "old(raw)", "old(buf)", "new", "speedup");
+        System.out.println("-".repeat(83));
 
         for (int[] s : scenarios) {
             int rows = s[0], cols = s[1], flen = s[2], iters = s[3];
@@ -138,15 +170,27 @@ public class ReaderBenchmark {
             long tOldRaw = benchOld(data, iters);
             long tOldBuf = benchOldBuffered(data, iters);
             long tNew    = benchNew(data, iters);
-            long tDecode = benchDecode(data, iters);
 
-            double msOldRaw = tOldRaw / 1e6;
-            double msOldBuf = tOldBuf / 1e6;
-            double msNew    = tNew / 1e6;
-            double msDecode = tDecode / 1e6;
+            System.out.printf("%-35s %10.1f ms %10.1f ms %10.1f ms %7.2fx%n",
+                label, tOldRaw/1e6, tOldBuf/1e6, tNew/1e6, (double)tOldBuf / tNew);
+        }
 
-            System.out.printf("%-35s %10.1f ms %10.1f ms %10.1f ms %10.1f ms %7.2fx%n",
-                label, msOldRaw, msOldBuf, msNew, msDecode, msOldBuf / msNew);
+        System.out.println();
+        System.out.println("=== Decode: old charAt vs new indexOf ===");
+        System.out.printf("%-35s %12s %12s %8s%n",
+            "scenario", "old", "new", "speedup");
+        System.out.println("-".repeat(71));
+
+        for (int[] s : scenarios) {
+            int rows = s[0], cols = s[1], flen = s[2], iters = s[3];
+            String data = generateData(rows, cols, flen);
+            String label = rows + "r x " + cols + "c x " + flen + "ch (" + (data.length()/1024) + "KB)";
+
+            long tOld = benchOldDecode(data, iters);
+            long tNew = benchDecode(data, iters);
+
+            System.out.printf("%-35s %10.1f ms %10.1f ms %7.2fx%n",
+                label, tOld/1e6, tNew/1e6, (double)tOld / tNew);
         }
     }
 }
